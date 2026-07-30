@@ -3,7 +3,7 @@ const {
 } = require('../package')
 
 module.exports = {
-    title: 'OpenCore Install Guide',
+    title: 'pearOS Install Guide',
     head: [
         ['meta', {
             name: 'theme-color',
@@ -55,7 +55,7 @@ module.exports = {
 
     themeConfig: {
         lastUpdated: true,
-        repo: 'https://github.com/dortania/OpenCore-Install-Guide',
+        repo: 'https://github.com/pearOS-archlinux/pearOS-documentation',
         editLinks: true,
         editLinkText: 'Help us improve this page!',
         logo: '/homepage.png',
@@ -98,7 +98,7 @@ module.exports = {
             sidebarDepth: 1,
             children: [
                 'prerequisites',
-                'macos-limits',
+                'pearos-limits',
                 'find-hardware',
                 'terminology',
                 'why-oc',

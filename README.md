@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /dortania-logo-clear.png
-heroText: Dortania's OpenCore Install Guide
+heroText: pearOS Install Guide
 actionText: Getting Started→
 actionLink: prerequisites.md
 
@@ -10,17 +10,27 @@ meta:
   content: Current supported version 1.0.6
 ---
 
-# What is OpenCore and who is this guide for
+# What is pearOS and who is this guide for
 
-OpenCore is what we refer to as a "boot loader" – it is a complex piece of software that we use to prepare our systems for macOS – specifically by injecting new data for macOS such as SMBIOS, ACPI tables and kexts. How this tool differs from others like Clover is that it has been designed with security and quality in mind, allowing us to use many security features found on real Macs, such as [System Integrity Protection](https://support.apple.com/en-ca/HT204899) and [FileVault](https://support.apple.com/en-ca/HT204837). A more in-depth look can be found here: [Why OpenCore over Clover and others](why-oc.md)
+pearOS is a custom distribution, primarily Linux, that is made to mimic the look and feel of the bitten fruit's OS (you know what OS), and bring the macOS experience on non-apple devices, easier and much more stable than any hackintosh, while keeping the entire Open Source Software Experience.
+
+It is made by one person - Alexandru Balan - a guy from Romania, started this project at 13 years old, first release at 15 years old, bugs are expected.
+<br></br>
+This Project started by Alex, in 2017, first release in 2019. It was based on Debian Linux (some kUbuntu, some KDE Neon). <br></br>
+
+In 2021, NiceC0re got released: Arch Based, more stable, rolling release, package repository.<br></br>
+
+In 2025 October, pearOS NiceC0re got a huge facelift, ISO image moved onto a Cloudflare R2 Bucked, package repository on R2 as well.<br></br>
+
+Currently, I am developing Soda Desktop Environment. Why Soda? Because the Bitten Fruit has Aqua DE.
 
 This guide specifically focuses on two main things:
 
-* Installing macOS on an X86-based PC
-* Teaching you what makes your Hack work
+* Installing pearOS on an X86-based PC
+* Teaching you fix bugs and problems
 
-Because of this, you will be expected to read, learn and even use Google. This is not a simple one-click install setup.
+Because of this, you will be expected to read, learn and even use Google/Gemini/ChatGPT.
 
-Please remember that OpenCore is still new and currently in beta. While quite stable, and arguably much more stable than Clover in pretty much every way, it is still being frequently updated, so chunks of configuration change quite often (i.e. new quirks replacing old ones).
+Please remember that pearOS is still relatively new and currently in beta, being maintained and developed by only one single person, Alexandru Balan, from Romania. While quite stable, it is still being frequently updated (one major release per month/in two months), so keep an eye on the repo.
 
-Lastly, those having issues can visit both the [r/Hackintosh subreddit](https://www.reddit.com/r/hackintosh/) and [r/Hackintosh Discord](https://discord.gg/u8V7N5C) for more help.
+Lastly, those having issues can visit both the [r/pearos subreddit](https://www.reddit.com/r/pearOS/) and [pearOS Community Discord](https://discord.gg/ZX7GnqKWNr) for more help.

@@ -1,6 +1,6 @@
 # Hardware Limitations
 
-With macOS, there are numerous hardware limitations you need to be aware of before stepping foot into an installation. This is due to the limited amount of hardware Apple supports, so we're either limited by Apple or what patches the community has created.
+With pearOS, there are numerous hardware limitations you need to be aware of before stepping foot into an installation.
 
 The main hardware sections to verify are:
 
@@ -38,20 +38,9 @@ For CPU support, we have the following breakdown:
 
 Architecture Requirements
 
-* 32-bit CPUs are supported from 10.4.1 to 10.6.8
-  * Note that 10.7.x requires 64-bit userspace, limiting 32-bit CPUs to 10.6
+* 32-bit CPUs are NOT supported
 * 64-bit CPUs are supported from 10.4.1 to current
 
-SSE Requirements:
-
-* SSE3 is required for all Intel versions of OS X/macOS
-* SSSE3 is required for all 64-bit versions of OS X/macOS
-  * For CPUs missing SSSE3 (i.e. certain 64-bit Pentiums), we recommend running 32-bit userspace (`i386-user32`)
-* SSE4 is required for macOS 10.12 and newer
-* SSE4.2 is required for macOS 10.14 and newer
-  * SSE4.1 CPUs are supported with [telemetrap.kext](https://forums.macrumors.com/threads/mp3-1-others-sse-4-2-emulation-to-enable-amd-metal-driver.2206682/post-28447707)
-  * Newer AMD drivers also require SSE4.2 for Metal support. To resolve this, see here: [MouSSE: SSE4.2 emulation](https://forums.macrumors.com/threads/mp3-1-others-sse-4-2-emulation-to-enable-amd-metal-driver.2206682/)
-* AVX2 is required for macOS 13 and newer
 
 ::: details macOS Ventura and AVX2 Details
 
@@ -65,83 +54,7 @@ Apple has left a dyld cache that does not use AVX2 instructions in Ventura to su
 
 Because of these caveats, the Dortania guide will no longer be supporting pre-Haswell CPUs for Ventura and above. The pages for these CPUs will remain updated for Monterey.
 
-:::
 
-Firmware Requirements:
-
-* OS X 10.4.1 through 10.4.7 require EFI32 (i.e. IA32 (32-bit) version of OpenCore)
-  * OS X 10.4.8 through 10.7.5 support both EFI32 and EFI64
-* OS X 10.8 and newer require EFI64 (i.e. x64 (64-bit) version of OpenCore)
-* OS X 10.7 through 10.9 require OpenPartitionDxe.efi to boot the Recovery partition
-
-Kernel Requirements:
-
-* OS X 10.4 and 10.5 require 32-bit kexts due to only supporting 32-bit kernelspace
-  * OS X 10.6 and 10.7 support both 32 and 64-bit kernelspace
-* OS X 10.8 and newer require 64-bit kexts due to only supporting 64-bit kernelspace
-  * Run `lipo -archs` to know what architectures your kext supports (remember to run this on the binary itself and not the .kext bundle)
-
-Core/Thread Count Limits:
-
-* OS X 10.10 and below may not boot with more than 24 threads (evident by a `mp_cpus_call_wait() timeout` panic)
-* OS X 10.11 and newer have a 64 thread limit
-* `cpus=` boot argument can be used as a workaround, or disabling hyperthreading
-
-Special Notes:
-
-* OS X 10.6 and older require RebuildAppleMemoryMap enabled
-  * This is to resolve an early kernel
-
-:::
-
-::: details Intel CPU Support Chart
-
-Support based off of Vanilla Kernels (i.e. no modifications):
-
-| CPU Generation | Initial support | Last supported version | Notes | CPUID |
-| :--- | :--- | :--- | :--- | :--- |
-| [Pentium 4](https://en.wikipedia.org/wiki/Pentium_4) | 10.4.1 | 10.5.8 | Only used in dev kits | 0x0F41 |
-| [Yonah](https://en.wikipedia.org/wiki/Yonah_(microprocessor)) | 10.4.4 | 10.6.8 | 32-Bit | 0x0006E6 |
-| [Conroe](https://en.wikipedia.org/wiki/Conroe_(microprocessor)), [Merom](https://en.wikipedia.org/wiki/Merom_(microprocessor)) | 10.4.7 | 10.11.6 | No SSE4 | 0x0006F2 |
-| [Penryn](https://en.wikipedia.org/wiki/Penryn_(microarchitecture)) | 10.4.10 | 10.13.6 | No SSE4.2 | 0x010676 |
-| [Nehalem](https://en.wikipedia.org/wiki/Nehalem_(microarchitecture)) | 10.5.6 | 12.7.6 | N/A | 0x0106A2 |
-| [Lynnfield](https://en.wikipedia.org/wiki/Lynnfield_(microprocessor)), [Clarksfield](https://en.wikipedia.org/wiki/Clarksfield_(microprocessor)) | 10.6.3 | ^^ | No iGPU support 10.14+ | 0x0106E0 |
-| [Westmere, Clarkdale, Arrandale](https://en.wikipedia.org/wiki/Westmere_(microarchitecture)) | 10.6.4 | ^^ | ^^ | 0x0206C0 |
-| [Sandy Bridge](https://en.wikipedia.org/wiki/Sandy_Bridge) | 10.6.7 | ^^ | ^^ | 0x0206A0(M/H) |
-| [Ivy Bridge](https://en.wikipedia.org/wiki/Ivy_Bridge_(microarchitecture)) | 10.7.3 | ^^ | No iGPU support 12+ | 0x0306A0(M/H/G) |
-| [Ivy Bridge-E5](https://en.wikipedia.org/wiki/Ivy_Bridge_(microarchitecture)) | 10.9.2 | ^^ | N/A | 0x0306E0 |
-| [Haswell](https://en.wikipedia.org/wiki/Haswell_(microarchitecture)) | 10.8.5 | <span style="color:green"> Current </span> | No iGPU support 13+ | 0x0306C0(S) |
-| [Broadwell](https://en.wikipedia.org/wiki/Broadwell_(microarchitecture)) | 10.10.0 | ^^ | ^^ | 0x0306D4(U/Y) |
-| [Skylake](https://en.wikipedia.org/wiki/Skylake_(microarchitecture)) | 10.11.0 | ^^ | Current | 0x0506e3(H/S) 0x0406E3(U/Y) |
-| [Kaby Lake](https://en.wikipedia.org/wiki/Kaby_Lake) | 10.12.4 | ^^ | ^^ | 0x0906E9(H/S/G) 0x0806E9(U/Y) |
-| [Coffee Lake](https://en.wikipedia.org/wiki/Coffee_Lake) | 10.12.6 | ^^ | ^^ | 0x0906EA(S/H/E) 0x0806EA(U)|
-| [Amber](https://en.wikipedia.org/wiki/Kaby_Lake#List_of_8th_generation_Amber_Lake_Y_processors), [Whiskey](https://en.wikipedia.org/wiki/Whiskey_Lake_(microarchitecture)), [Comet Lake](https://en.wikipedia.org/wiki/Comet_Lake_(microprocessor)) | 10.14.1 | ^^ | ^^ | 0x0806E0(U/Y) |
-| [Comet Lake](https://en.wikipedia.org/wiki/Comet_Lake_(microprocessor)) | 10.15.4 | ^^ | ^^ | 0x0906E0(S/H)|
-| [Ice Lake](https://en.wikipedia.org/wiki/Ice_Lake_(microprocessor)) | ^^ | ^^ | ^^ | 0x0706E5(U) |
-| [Rocket Lake](https://en.wikipedia.org/wiki/Rocket_Lake) | ^^ | ^^ | Requires Comet Lake CPUID | 0x0A0671 |
-| Newer CPUs | <span style="color:red"> N/A </span> | ^^ | ^^ | N/A |
-
-:::
-
-::: details AMD CPU Limitations in macOS
-
-Unfortunately many features in macOS are outright unsupported with AMD and many others being partially broken. These include:
-
-* Virtual Machines relying on AppleHV
-  * This includes VirtualBox, VMWare, Parallels, Docker, Android Studio, etc
-  * VirtualBox 6, VMware 10, and Parallels 13.1.0 do support their own hypervisor, however using such outdated VM software poses a large security threat
-* Adobe and Intel MKL/OneAPI Library Support
-  * Most of Adobe's suite relies on Intel's Memfast instruction set, resulting in crashes with AMD CPUs
-  * Other apps make use of Intel's MKL/OneAPI library, which does not work properly with AMD as they assume macOS exclusively runs on Intel CPUs
-  * You can use patchers such as [AMDFriend](https://github.com/NyaomiDEV/AMDFriend) to work around this
-* 32-Bit support
-  * For those still relying on 32-Bit software in Mojave and below, note that the Vanilla patches do not support 32-bit instructions
-  * A work-around is to install a [custom kernel](https://files.amd-osx.com/?dir=Kernels), however you lose iMessage support and no support is provided for these kernels
-* Stability issues on many apps
-  * Audio-based apps are the most prone to issues, ie. Logic Pro
-  * DaVinci Resolve has been known to have sporadic issues as well
-
-:::
 
 ## GPU Support
 
