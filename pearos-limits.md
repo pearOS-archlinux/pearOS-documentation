@@ -6,135 +6,107 @@ The main hardware sections to verify are:
 
 [[toc]]
 
-And for more detailed guides on the subject, see here:
-
-* [GPU Buyers Guide](https://dortania.github.io/GPU-Buyers-Guide/)
-  * Check if your GPU is supported and which macOS version you can run.
-* [Wireless Buyers Guide](https://dortania.github.io/Wireless-Buyers-Guide/)
-  * Check if your WiFi card is supported.
-* [Anti-Hardware Buyers Guide](https://dortania.github.io/Anti-Hackintosh-Buyers-Guide/)
-  * Overall guide on what to avoid and what pitfalls your hardware may hit.
 
 ## CPU Support
 
-For CPU support, we have the following breakdown:
+pearOS is Arch-based Linux, so CPU support is broad. The real limits come from the ISO build itself:
 
-* Both 32 and 64-bit CPUs are supported
-  * This however requires the OS to support your architecture, see CPU Requirements section below
-* Intel's Desktop CPUs are supported.
-  * Yonah through Comet Lake are supported by this guide.
-* Intel's High-End Desktops and Server CPUs.
-  * Nehalem through Cascade Lake X are supported by this guide.
-* Intel's Core "i" and Xeon series laptop CPUs
-  * Arrandale through Ice Lake are supported by this guide.
-  * Note that Mobile Atoms, Celeron and Pentium CPUs are not supported
-* AMD's Desktop Bulldozer (15h), Jaguar (16h) and Ryzen (17h) CPUs
-  * Laptop CPUs are **not** supported
-  * Note not all features of macOS are supported with AMD, see below
+* **64-bit (x86_64) only** — the ISO is built exclusively for `x86_64`; **32-bit (i686) CPUs are NOT supported**, no fallback image is produced.
+* **Intel** — any x86_64 Intel CPU works, from old Core 2 era through current. Microcode updates are handled by the bundled `intel-ucode` package.
+* **AMD** — any x86_64 AMD CPU works, same story. Microcode updates come from `amd-ucode`.
+* No distinction between desktop/laptop/HEDT CPUs — if it's x86_64, the OS boots and runs.
 
-**For more in-depth information, see here: [Anti-Hardware Buyers Guide](https://dortania.github.io/Anti-Hackintosh-Buyers-Guide/)**
+Features aren't gated by CPU generation — everything that's a kernel/driver-level feature (GPU accel, wireless, etc.) depends on the *specific hardware component*, not the CPU family. See the sections below for those.
 
 ::: details CPU Requirements
 
-Architecture Requirements
+* 32-bit (i686) CPUs are **NOT** supported — the ISO has no i686 build target.
+* Any 64-bit (x86_64) Intel or AMD CPU is supported.
 
-* 32-bit CPUs are NOT supported
-* 64-bit CPUs are supported from 10.4.1 to current
-
-
-::: details macOS Ventura and AVX2 Details
-
-macOS Ventura drops support for pre-Haswell CPUs. Much of userspace now requires AVX2 support, along with AMD Polaris GPU drivers and some instances of AVX2 instructions in some kexts. Although the kexts can be [patched](https://forums.macrumors.com/threads/monterand-probably-the-start-of-an-ongoing-saga.2320479/post-31125212) or [downgraded](https://github.com/dortania/OpenCore-Legacy-Patcher/blob/92ff4244ae78de715977d9f8d054cdf9bdce4011/payloads/Kexts/Misc/NoAVXFSCompressionTypeZlib-AVXpel-v12.6.zip), the Polaris GPU drivers and most of userspace rely on AVX2 too much to be able to be patched.
-
-Apple has left a dyld cache that does not use AVX2 instructions in Ventura to support Rosetta on Apple Silicon machines, but this cache is not installed by default. You can use [CryptexFixup](https://github.com/acidanthera/CryptexFixup) to force this dyld cache to be installed, but:
-
-* Apple may remove this cache at any time in the future if they add AVX2 support to Rosetta
-* Delta updates (small 1-3GB updates) will no longer be available and you must install the full update (12GB), as delta updates only contain the non-AVX2 cache on Apple Silicon machines
-* Polaris GPUs remain unsupported on machines without AVX2
-
-Because of these caveats, the Dortania guide will no longer be supporting pre-Haswell CPUs for Ventura and above. The pages for these CPUs will remain updated for Monterey.
+:::
 
 
 
 ## GPU Support
 
-::: tip
+pearOS ships the following GPU stack by default:
 
-Please see the [GPU Buyers Guide](https://dortania.github.io/GPU-Buyers-Guide/) for information about compatible GPUs.
+* **Intel & AMD** — open-source `mesa` drivers (i915/iris, amdgpu/radeonsi), no extra setup needed.
+* **NVIDIA** — `nvidia-utils` + `linux-cachyos-lts-nvidia-open` (open kernel module, Turing and newer). Older (pre-Turing) cards need the legacy proprietary driver, not included by default.
+* **Virtualized/VM GPUs** — `vulkan-virtio` for virtio-gpu passthrough in VMs.
 
-:::
-
-And an important note for **Laptops with discrete GPUs**:
-
-* 90% of discrete GPUs will not work because they are wired in a configuration that macOS doesn't support (switchable graphics). With NVIDIA discrete GPUs, this is usually called Optimus. It is not possible to utilize these discrete GPUs for the internal display, so it is generally advised to disable them and power them off (will be covered later in this guide).
-* However, in some cases, the discrete GPU powers any external outputs (HDMI, mini DisplayPort, etc.), which may or may not work; in the case that it will work, you will have to keep the card on and running.
-* However, there are some laptops that rarely do not have switchable graphics, so the discrete card can be used (if supported by macOS), but the wiring and setup usually cause issues.
-
-## Motherboard Support
-
-For the most part, all motherboards are supported as long as the CPU is.
-
-::: details MSI 500-series AMD motherboards note
-
-~~The exception is MSI 500-series AMD motherboards (A520, B550, and X570). These motherboards have issues with macOS Monterey and above:~~
-
-* ~~PCIe devices are not always enumerated properly~~
-* ~~The BIOS update for Zen 3 support breaks boot~~
-
-~~macOS Big Sur or earlier is recommended for these motherboards.~~
-
-Thanks to CaseySJ, this has been fixed in the latest version of the AMD vanilla patches!
-
-:::
 
 ## Storage Support
 
-For the most part, all SATA based drives are supported and the majority of NVMe drives as well. There are only a few exceptions:
+pearOS runs on the Linux kernel, so storage support is native and broad.
 
-* **Samsung PM981, PM991 and Micron 2200S NVMe SSDs**
-  * These SSDs are not compatible out of the box (causing kernel panics) and therefore require [NVMeFix.kext](https://github.com/acidanthera/NVMeFix/releases) to fix these kernel panics. Note that these drives may still cause boot issues even with NVMeFix.kext.
-  * On a related note, Samsung 970 EVO Plus NVMe SSDs also had the same problem but it was fixed in a firmware update; get the update (Windows via Samsung Magician or bootable ISO) [here](https://www.samsung.com/semiconductor/minisite/ssd/download/tools/).
-  * Also to note, laptops that use [Intel Optane Memory](https://www.intel.com/content/www/us/en/architecture-and-technology/optane-memory.html) or [Micron 3D XPoint](https://www.micron.com/products/advanced-solutions/3d-xpoint-technology) for HDD acceleration are unsupported in macOS. Some users have reported success in Catalina with even read and write support but we highly recommend removing the drive to prevent any potential boot issues.
-    * Note that Intel Optane Memory H10/H20 models are compatible if the Optane part is disabled in macOS. More information can be found [here](https://blog.csdn.net/weixin_46341175/article/details/126626808) ([original Chinese source](https://zhuanlan.zhihu.com/p/429073173)).
-  
-* **Intel 600p**
-  * While not unbootable, please be aware this model can cause numerous problems. [Any fix for Intel 600p NVMe Drive? #1286](https://github.com/acidanthera/bugtracker/issues/1286)
-  * The 660p model is fine
+* **SATA, NVMe, USB, eMMC** — all supported out of the box via the kernel's own drivers.
+* **Filesystems** — ext4 by default, plus `btrfs-progs`, `xfsprogs`, `f2fs-tools`, `dosfstools`, `exfatprogs`, and `ntfs-3g` (NTFS read/write) are bundled.
+* **RAID/LVM/Encryption** — `mdadm` (software RAID), `lvm2` (logical volumes), and `cryptsetup` (LUKS full-disk encryption) are all included.
+* **NVMe tooling** — `nvme-cli` is bundled for drive health/management.
 
 ## Wired Networking
 
-Virtually all wired network adapters have some form of support in macOS, either by the built-in drivers or community made kexts. The main exceptions:
-
-* Intel I225-V 2.5Gb NIC
-  * Found on high-end Desktop Comet Lake boards
-  * Requires device properties: [Source](https://www.hackintosh-forum.de/forum/thread/48568-i9-10900k-gigabyte-z490-vision-d-er-läuft/?postID=606059#post606059) and [Example](config.plist/comet-lake.md#deviceproperties)
-* Intel I350 1Gb server NIC
-  * Normally found on Intel and Supermicro server boards of various generations
-  * [Requires device properties](config-HEDT/ivy-bridge-e.md#deviceproperties)
-* Intel 10Gb server NICs
-  * Workarounds are possible for [X520 and X540 chipsets](https://www.tonymacx86.com/threads/how-to-build-your-own-imac-pro-successful-build-extended-guide.229353/)
-* Mellanox and Qlogic server NICs
+Virtually all wired network adapters work out of the box in pearOS
 
 ## Wireless Networking
 
-Most WiFi cards that come with laptops are not supported as they are usually Intel/Qualcomm. If you are lucky, you may have a supported Atheros card, but support only runs up to High Sierra.
+Since pearOS runs the standard Linux kernel, WiFi support is broad — Intel, Qualcomm Atheros, Broadcom, MediaTek and Realtek cards all work with their native `mac80211`-based kernel drivers. Bluetooth follows the same coverage as the WiFi chip on combo cards.
 
-The best option is getting a supported Broadcom card; see the [WiFi Buyer's Guide](https://dortania.github.io/Wireless-Buyers-Guide/) for recommendations.
+Firmware for most chipsets ships via `linux-firmware`; a handful of Broadcom/MediaTek chips may need vendor-specific firmware packages installed manually if not covered.
 
-Note: Intel WiFi is unofficially (3rd party driver) supported on macOS, check [WiFi Buyer's Guide](https://dortania.github.io/Wireless-Buyers-Guide/) for more information about the drivers and supported cards.
 
 ## Miscellaneous
 
 * **Fingerprint sensors**
-  * There is currently no way to emulate the Touch ID sensor, so fingerprint sensors will not work.
-* **Windows Hello Face Recognition**
-  * Some laptops come with WHFR that is I2C connected (and used through your iGPU), those will not work.
-  * Some laptops come with WHFR that is USB connected, if you're lucky, you may get camera functionality, but nothing else.
+  * Fingerprint login works through `libfprint`/`fprintd`, provided your sensor is supported. See the list below.
+
+::: details Supported Fingerprint Sensors (libfprint)
+
+| Vendor | Device Name | USB ID | Driver |
+|--------|------------|--------|--------|
+| Microsoft | Digital Persona U.are.U 4000/4000B/4500 | 045e:00bb, 045e:00bc, 045e:00bd, 045e:00ca | Digital Persona |
+| UPEK | TouchChip/Eikon Touch 300 | 0483:2015, 0483:2017 | UPEK TouchChip |
+| UPEK | TouchStrip | 0483:2016 | UPEK TouchStrip |
+| ElanTech | Fingerprint Sensor | 04f3:0903, 04f3:0907, 04f3:0c01-0c33, 04f3:0c3d, 04f3:0c42, 04f3:0c4b, 04f3:0c4d, 04f3:0c4f, 04f3:0c58, 04f3:0c63, 04f3:0c6e | ElanTech |
+| ElanTech | MOC Sensors | 04f3:0c7d-0c8d, 04f3:0c98-0c9d, 04f3:0c9f, 04f3:0ca3, 04f3:0ca7-0cb6 | Elan MOC |
+| Digital Persona | U.are.U 4000/4000B/4500 | 05ba:0007, 05ba:0008, 05ba:000a | Digital Persona |
+| Veridicom | 5thSense | 061a:0110 | Veridicom |
+| Synaptics | Sensors | 06cb:00bd-0109, 06cb:010d-010e, 06cb:0123-0124, 06cb:0126, 06cb:0129, 06cb:015f, 06cb:0168-0169, 06cb:016c, 06cb:0173-0174, 06cb:019d, 06cb:019f-01a0, 06cb:01a4 | Synaptics |
+| AuthenTec | AES1610 | 08ff:1600 | AuthenTec |
+| AuthenTec | AES1660 | 08ff:1660-1689, 08ff:168a-168f | AuthenTec |
+| AuthenTec | AES2501 | 08ff:2500, 08ff:2580 | AuthenTec |
+| AuthenTec | AES2550/AES2810 | 08ff:2550, 08ff:2810 | AuthenTec |
+| AuthenTec | AES2660 | 08ff:2660-268f, 08ff:2691 | AuthenTec |
+| AuthenTec | AES4000 | 08ff:5501 | AuthenTec |
+| AuthenTec | AES3500 | 08ff:5731 | AuthenTec |
+| Realtek | MOC Fingerprint Sensor | 0bda:5813, 0bda:5816, 2541:fa03, 3274:9003 | Realtek MOC |
+| FPC | MOC Fingerprint Sensor | 10a5:9524, 10a5:9544, 10a5:9b24, 10a5:a305-a306, 10a5:c844, 10a5:d205, 10a5:d805, 10a5:da04, 10a5:ffe0 | FPC MOC |
+| SecuGen | Hamster Pro 20 | 1162:2200 | SecuGen |
+| Validity | VFS101 | 138a:0001 | Validity |
+| Validity | VFS301 | 138a:0005, 138a:0008 | Validity |
+| Validity | VFS5011 | 138a:0010, 138a:0011, 138a:0015-0018 | Validity |
+| Validity | VFS0050 | 138a:0050 | Validity |
+| Validity | VFS7552 | 138a:0091 | Validity |
+| UPEK | TouchStrip Sensor-Only | 147e:1000, 147e:1001 | UPEK |
+| UPEK | TouchChip Fingerprint Coprocessor | 147e:2016, 147e:2020, 147e:3001 | UPEK |
+| Egis Technology (LighTuning) | 0570 | 1c7a:0570, 1c7a:0571 | Egis Technology |
+| Egis Technology (LighTuning) | Match-on-Chip | 1c7a:0582-0588, 1c7a:05a1, 1c7a:05ae, 1c7a:9201 | Egis MOC |
+| Egis Technology | ES603 | 1c7a:0603 | EgisTec |
+| Goodix | MOC Fingerprint Sensor | 27c6:5840, 27c6:6014, 27c6:6090-6092, 27c6:6094, 27c6:609a, 27c6:609c, 27c6:60a2, 27c6:60a4, 27c6:60bc, 27c6:60c2, 27c6:6304, 27c6:631c, 27c6:633c, 27c6:634c, 27c6:6382, 27c6:6384, 27c6:639c, 27c6:63ac, 27c6:63bc, 27c6:63cc, 27c6:6496, 27c6:650a, 27c6:650c, 27c6:6512, 27c6:6582, 27c6:6584, 27c6:658c, 27c6:6592, 27c6:6594, 27c6:659a, 27c6:659c, 27c6:66a9, 27c6:6890, 27c6:689a, 27c6:6984, 27c6:6a94 | Goodix MOC |
+| Focaltech | MOC Sensors | 2808:077a, 2808:079a, 2808:1579, 2808:5158, 2808:6553, 2808:9e48, 2808:a27a, 2808:a57a, 2808:a78a, 2808:a959, 2808:a97a, 2808:a99a, 2808:d979 | Focaltech MOC |
+| NextBiometrics | NB-1010-U/NB-2020-U | 298d:1010, 298d:2020 | NextBiometrics |
+| MAFP | MOC Fingerprint Sensor | 3274:8012 | MAFP MOC |
+| ElanTech | Embedded Fingerprint Sensor (SPI) | ELAN7001/ELAN70A1 | ElanTech Embedded |
+
+Drivers might not all be available in the stable, released version of `libfprint`. Full up-to-date list: [fprint.freedesktop.org/supported-devices.html](https://fprint.freedesktop.org/supported-devices.html)
+
+:::
+* **IR/Facial Recognition Cameras**
+  * Laptops with an IR camera for facial login generally have no Linux driver for the recognition feature itself, though the camera may still work as a plain webcam.
 * **Intel Smart Sound Technology**
-  * Laptops with Intel SST will not have anything connected through them (usually internal mic) work, as it is not supported. You can check with Device Manager on Windows.
+  * Handled via `sof-firmware`; internal mics and speakers routed through Intel SST generally work through `pipewire`.
 * **Headphone Jack Combo**
   * Some laptops with a combo headphone jack may not get audio input through them and will have to either use the built-in microphone or an external audio input device through USB.
-* **Thunderbolt USB-C ports**
-  * (Hackintosh) Thunderbolt support is currently still iffy in macOS, even more so with Alpine Ridge controllers, which most current laptops have. There have been attempts to keep the controller powered on, which allows Thunderbolt and USB-C hotplug to work, but it comes at the cost of kernel panics and/or USB-C breaking after sleep. If you want to use the USB-C side of the port and be able to sleep, you must plug it in at boot and keep it plugged in.
-  * Note: This does not apply to USB-C only ports - only Thunderbolt 3 and USB-C combined ports.
-  * Disabling Thunderbolt in the BIOS will also resolve this.
+* **Thunderbolt / USB-C**
+  * Thunderbolt is supported via the kernel `thunderbolt` driver and the `bolt` daemon (device authorization), with `plasma-thunderbolt` providing the GUI. Hotplug and sleep/wake work as expected.
