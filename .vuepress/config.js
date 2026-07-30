@@ -22,7 +22,7 @@ module.exports = {
             href: "/styles/website.css"
         },]
     ],
-    base: '/OpenCore-Install-Guide/',
+    base: '/pearOS-documentation/',
 
     watch: {
         $page(newPage, oldPage) {
