@@ -6,7 +6,6 @@ The main hardware sections to verify are:
 
 [[toc]]
 
-
 ## CPU Support
 
 pearOS is Arch-based Linux, so CPU support is broad. The real limits come from the ISO build itself:
@@ -25,8 +24,6 @@ Features aren't gated by CPU generation — everything that's a kernel/driver-le
 
 :::
 
-
-
 ## GPU Support
 
 pearOS ships the following GPU stack by default:
@@ -34,7 +31,6 @@ pearOS ships the following GPU stack by default:
 * **Intel & AMD** — open-source `mesa` drivers (i915/iris, amdgpu/radeonsi), no extra setup needed.
 * **NVIDIA** — `nvidia-utils` + `linux-cachyos-lts-nvidia-open` (open kernel module, Turing and newer). Older (pre-Turing) cards need the legacy proprietary driver, not included by default.
 * **Virtualized/VM GPUs** — `vulkan-virtio` for virtio-gpu passthrough in VMs.
-
 
 ## Storage Support
 
@@ -54,7 +50,6 @@ Virtually all wired network adapters work out of the box in pearOS
 Since pearOS runs the standard Linux kernel, WiFi support is broad — Intel, Qualcomm Atheros, Broadcom, MediaTek and Realtek cards all work with their native `mac80211`-based kernel drivers. Bluetooth follows the same coverage as the WiFi chip on combo cards.
 
 Firmware for most chipsets ships via `linux-firmware`; a handful of Broadcom/MediaTek chips may need vendor-specific firmware packages installed manually if not covered.
-
 
 ## Miscellaneous
 
@@ -102,6 +97,7 @@ Firmware for most chipsets ships via `linux-firmware`; a handful of Broadcom/Med
 Drivers might not all be available in the stable, released version of `libfprint`. Full up-to-date list: [fprint.freedesktop.org/supported-devices.html](https://fprint.freedesktop.org/supported-devices.html)
 
 :::
+
 * **IR/Facial Recognition Cameras**
   * Laptops with an IR camera for facial login generally have no Linux driver for the recognition feature itself, though the camera may still work as a plain webcam.
 * **Intel Smart Sound Technology**
