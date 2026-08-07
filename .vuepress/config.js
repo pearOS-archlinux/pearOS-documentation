@@ -83,6 +83,7 @@ module.exports = {
             sidebarDepth: 1,
             children: [
                 'update-problems',
+                'wireless-broadcom',
             ]
         },
         ],
