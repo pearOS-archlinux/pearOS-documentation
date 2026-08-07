@@ -68,6 +68,23 @@ module.exports = {
                 'pearos-limits',
             ]
         },
+        {
+            title: 'How the system works',
+            collapsable: false,
+            sidebarDepth: 1,
+            children: [
+                'graphics-drivers',
+                'package-repositories',
+            ]
+        },
+        {
+            title: 'Troubleshooting',
+            collapsable: false,
+            sidebarDepth: 1,
+            children: [
+                'update-problems',
+            ]
+        },
         ],
     },
     plugins: [
