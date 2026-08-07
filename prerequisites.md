@@ -14,7 +14,7 @@ Before we can jump head first into making an pearOS system, we need to go over a
 4. <span style="color:red">_**[CRUCIAL]**_</span> A minimum of:
    * 8GB USB drive
    * 50GB Disk Space
-5. <span style="color:yellow">_**[GOOD TO HAVE]**_</span> An **Internet connection** 
+5. <span style="color:yellow">_**[GOOD TO HAVE]**_</span> An **Internet connection**
 
    * For people who can't use ethernet but have an Android phone, you can connect your Android/iOS phone to WiFi and then tether it using USB.
 
@@ -23,5 +23,5 @@ Before we can jump head first into making an pearOS system, we need to go over a
      * macOS (any)
      * Windows (Windows XP SP3 or newer)
      * Linux (any)
-   *  **15GB** of free space on the drive you're working on. On Windows, your OS disk (C:) must have at least **15GB** of free space.
+   * **15GB** of free space on the drive you're working on. On Windows, your OS disk (C:) must have at least **15GB** of free space.
    * will also require [Balena Etcher](https://etcher.balena.io/)
